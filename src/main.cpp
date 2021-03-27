@@ -32,7 +32,7 @@ const char *password = ""; //Password for the access point
 volatile unsigned long next;
 
 #define CPU_MHZ 80
-#define CHANNEL_NUMBER 8           //set the number of chanels
+#define CHANNEL_NUMBER 6           //set the number of chanels
 #define CHANNEL_DEFAULT_VALUE 1100 //set the default servo value
 #define FRAME_LENGTH 22500         //set the PPM frame length in microseconds (1ms = 1000µs)
 #define PULSE_LENGTH 300           //set the pulse length
@@ -131,16 +131,6 @@ void handleRoot()
     website += "      <input type=\"checkbox\" id=\"Button1\" onchange=\"Button2Change(this)\">\n";
     website += "      <span class=\"slider\"></span>\n";
     website += "    </label>\n";
-    website += "    <br>\n";
-    website += "    <label class=\"switch\">\n";
-    website += "      <input type=\"checkbox\" id=\"Button2\" onchange=\"Button3Change(this)\">\n";
-    website += "      <span class=\"slider\"></span>\n";
-    website += "    </label>\n";
-    website += "    <br>\n";
-    website += "    <label class=\"switch\">\n";
-    website += "      <input type=\"checkbox\" id=\"Button3\" onchange=\"Button4Change(this)\">\n";
-    website += "      <span class=\"slider\"></span>\n";
-    website += "    </label>\n";
 
     website += "    <div id=\"invert1div\" style=\"display: none; position: absolute; left: 20%; top: 1%;\">\n";
     website += "      Invert Y Axis<input type=\"checkbox\" id=\"invert1\">\n";
@@ -176,9 +166,9 @@ void handleRoot()
     website += "    var ctx_stickl;\n";
     website += "    var ctx_stickr;\n";
     website += "    var gamepads = {};\n";
-    website += "    var buttons=[0,0,0,0];\n";
-    website += "    var ppm=[1100,1100,1100,1100,1100,1100,1100,1100];\n";
-    website += "    var oldppm=[0,0,0,0,0,0,0,0];\n";
+    website += "    var buttons=[0,0];\n";
+    website += "    var ppm=[1100,1100,1100,1100,1100,1100];\n";
+    website += "    var oldppm=[0,0,0,0,0,0];\n";
 
     website += "    var connection = new WebSocket('ws://' + window.location.host + ':81', ['arduino'])\n";
 
@@ -282,24 +272,6 @@ void handleRoot()
     website += "        ppm[5]=1100;\n";
     website += "      window.requestAnimationFrame(update);\n";
     website += "      console.log(\"Button2: \" + ppm[5]);\n";
-    website += "    }\n";
-    website += "    function Button3Change(checkbox)\n";
-    website += "    {\n";
-    website += "      if(checkbox.checked==true)\n";
-    website += "        ppm[6]=1800;\n";
-    website += "      else\n";
-    website += "        ppm[6]=1100;\n";
-    website += "      window.requestAnimationFrame(update);\n";
-    website += "      console.log(\"Button3: \" + ppm[6]);\n";
-    website += "    }\n";
-    website += "     function Button4Change(checkbox)\n";
-    website += "    {\n";
-    website += "      if(checkbox.checked==true)\n";
-    website += "        ppm[7]=1800;\n";
-    website += "      else\n";
-    website += "        ppm[7]=1100;\n";
-    website += "      window.requestAnimationFrame(update);\n";
-    website += "      console.log(\"Button4: \" + ppm[7]);\n";
     website += "    }\n";
 
     website += "    function resize()\n";
@@ -517,7 +489,10 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t length)
     case WStype_BIN:
     {
         ppm[payload[0]] = (payload[1] << 8) + payload[2]; //the ppm data is sent by the website in three bytes. channel/hbyte/lbyte
+        Serial.printf("ppm[%u] : %d\n", payload[0], ppm[payload[0]]);
     }
+    break;
+    default:
     break;
     }
 }
