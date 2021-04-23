@@ -34,7 +34,7 @@ volatile unsigned long next;
 #define CPU_MHZ 80
 #define CHANNEL_NUMBER 6           //set the number of chanels
 #define CHANNEL_DEFAULT_VALUE 1100 //set the default servo value
-#define FRAME_LENGTH 22500         //set the PPM frame length in microseconds (1ms = 1000µs)
+#define FRAME_LENGTH 20000         //set the PPM frame length in microseconds (1ms = 1000µs)
 #define PULSE_LENGTH 300           //set the pulse length
 #define onState 0                  //set polarity of the pulses: 1 is positive, 0 is negative
 #define sigPin 0                   //set PPM signal output pin on the arduino
@@ -258,7 +258,7 @@ void handleRoot()
     website += "    function Button1Change(checkbox)\n";
     website += "    {\n";
     website += "      if(checkbox.checked==true)\n";
-    website += "        ppm[4]=1800;\n";
+    website += "        ppm[4]=1900;\n";
     website += "      else\n";
     website += "        ppm[4]=1100;\n";
     website += "      window.requestAnimationFrame(update);\n";
@@ -267,7 +267,7 @@ void handleRoot()
     website += "    function Button2Change(checkbox)\n";
     website += "    {\n";
     website += "      if(checkbox.checked==true)\n";
-    website += "        ppm[5]=1800;\n";
+    website += "        ppm[5]=1900;\n";
     website += "      else\n";
     website += "        ppm[5]=1100;\n";
     website += "      window.requestAnimationFrame(update);\n";
@@ -388,7 +388,7 @@ void handleRoot()
     website += "        h = nh;\n";
     website += "        resize();\n";
     website += "      }\n";
-    website += "      for(var i=0;i<8;i++){\n";
+    website += "      for(var i=0;i<6;i++){\n";
     website += "        if(ppm[i]!=oldppm[i])\n";
     website += "        {\n";
     website += "          oldppm[i]=ppm[i];\n";
@@ -543,5 +543,4 @@ void loop()
     webSocket.loop();
     dnsServer.processNextRequest();
     server.handleClient();
-    yield();
 }
