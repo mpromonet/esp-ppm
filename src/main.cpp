@@ -175,7 +175,6 @@ void handleRoot()
     website += "    connection.onopen = function () {         //open\n";
     website += "      console.log(\"Websocket Open\");\n";
     website += "      wsconnect=1;\n";
-    website += "      window.requestAnimationFrame(update);\n";
     website += "      draw_stick(ctx_stickl,ctx_stickl.canvas.width/2,ctx_stickl.canvas.height,0,1);\n";
     website += "      draw_stick(ctx_stickr,ctx_stickr.canvas.width/2,ctx_stickr.canvas.height/2,2,3);\n";
     website += "    };\n";
@@ -188,7 +187,7 @@ void handleRoot()
     website += "    };\n";
 
     website += "    connection.onmessage = function (e) {\n";
-    website += "       console.log(\"indata: \" + e);\n";
+    website += "       console.log(\"indata: \" + JSON.stringify(e));\n";
     website += "    }\n";
 
     website += "    connection.onclose = function (e)\n";
@@ -232,7 +231,6 @@ void handleRoot()
     website += "      c_stickl.addEventListener('touchmove', function(event) {\n";
     website += "        event.preventDefault();\n";
     website += "        touches = event.touches;\n";
-    website += "        window.requestAnimationFrame(update);\n";
     website += "      });\n";
     website += "      c_stickl.addEventListener('touchstart', function(event) {\n";
     website += "        console.log('startl');\n";
@@ -245,7 +243,6 @@ void handleRoot()
     website += "      c_stickr.addEventListener('touchmove', function(event) {\n";
     website += "        event.preventDefault();\n";
     website += "        touches = event.touches;\n";
-    website += "        window.requestAnimationFrame(update);\n";
     website += "      });\n";
     website += "      c_stickr.addEventListener('touchstart', function(event) {\n";
     website += "        console.log('startr');\n";
@@ -261,7 +258,6 @@ void handleRoot()
     website += "        ppm[4]=1900;\n";
     website += "      else\n";
     website += "        ppm[4]=1100;\n";
-    website += "      window.requestAnimationFrame(update);\n";
     website += "      console.log(\"Button1: \" + ppm[4]);\n";
     website += "    }\n";
     website += "    function Button2Change(checkbox)\n";
@@ -270,7 +266,6 @@ void handleRoot()
     website += "        ppm[5]=1900;\n";
     website += "      else\n";
     website += "        ppm[5]=1100;\n";
-    website += "      window.requestAnimationFrame(update);\n";
     website += "      console.log(\"Button2: \" + ppm[5]);\n";
     website += "    }\n";
 
@@ -341,16 +336,13 @@ void handleRoot()
     website += "    function gamepadHandler(event, connecting) {\n";
     website += "      var gamepad = event.gamepad;\n";
 
-    // Note:
-    // gamepad === navigator.getGamepads()[gamepad.index];
-
     website += "      if (connecting) {\n";
     website += "        gamepads[gamepad.index] = gamepad;\n";
     website += "        console.log(\"Joystick connected \" + gamepad.index);\n";
     website += "        document.getElementById(\"invert1div\").style.display=\"block\";\n";
     website += "        document.getElementById(\"invert2div\").style.display=\"block\";\n";
     website += "        document.getElementById(\"trimdiv\").style.display=\"block\";\n";
-    website += "        window.requestAnimationFrame(update);\n";
+    website += "        update();\n";
     website += "      } else {\n";
     website += "        console.log(\"Joystick disconnect\");\n";
     website += "        delete gamepads[gamepad.index];\n";
@@ -360,8 +352,9 @@ void handleRoot()
     website += "      }\n";
     website += "    }\n";
 
-    website += "    function checkButton(index){\n";
-    website += "        if(gamepads[0].buttons[index].value && !buttons[index])\n";
+    website += "    function checkButton(gamepad,index){\n";
+    website += "        var button = gamepad.buttons[index]\n";
+    website += "        if(button.value && !buttons[index])\n";
     website += "        {\n";
     website += "          buttons[index]=1;\n";
     website += "          console.log(\"Button\" + index);\n";
@@ -376,7 +369,7 @@ void handleRoot()
     website += "            ppm[4+index]=1100;\n";
     website += "          }\n";
     website += "        }\n";
-    website += "        if(!gamepads[0].buttons[index].value)\n";
+    website += "        if(!button.value)\n";
     website += "          buttons[index]=0;   \n";
     website += "      }\n";
 
@@ -400,20 +393,23 @@ void handleRoot()
     website += "            connection.send(sendframe);\n";
     website += "        }\n";
     website += "      }\n";
-    website += "      if(gamepads[0])\n";
-    website += "      {\n";
-    website += "        var pady0=(gamepads[0].axes[1]*ctx_stickl.canvas.height/2);\n";
-    website += "        var pady1=(gamepads[0].axes[3]*ctx_stickr.canvas.height/2);\n";
-    website += "        if(document.getElementById(\"invert1\").checked)\n";
-    website += "          pady0=-pady0;\n";
-    website += "        if(document.getElementById(\"invert2\").checked)\n";
-    website += "          pady1=-pady1;\n";
-    website += "        draw_stick(ctx_stickl,parseInt(document.getElementById(\"trim1x\").value)+((ctx_stickl.canvas.width/2)+(gamepads[0].axes[0]*ctx_stickl.canvas.width/2)),(ctx_stickl.canvas.height/2)+pady0-parseInt(document.getElementById(\"trim1y\").value),0,1);\n";
-    website += "        draw_stick(ctx_stickr,parseInt(document.getElementById(\"trim2x\").value)+(ctx_stickr.canvas.width/2)+(gamepads[0].axes[2]*ctx_stickr.canvas.width/2),(ctx_stickr.canvas.height/2)+pady1-parseInt(document.getElementById(\"trim2y\").value),2,3);\n";
-    website += "        checkButton(0);\n";
-    website += "        checkButton(1);\n";
-    website += "        checkButton(2);\n";
-    website += "        checkButton(3);\n";
+    website += "      const padKeys = Object.keys(gamepads)\n";
+    website += "      if(padKeys.length>0) {\n";
+    website += "        padKeys.forEach(padIndex => {\n";
+	website += "          const gamepad = window.navigator.getGamepads()[padIndex]\n";
+    website += "          var padx0=gamepad.axes[0]*ctx_stickl.canvas.width/2;\n";
+    website += "          var pady0=gamepad.axes[1]*ctx_stickl.canvas.height/2;\n";
+    website += "          var padx1=gamepad.axes[2]*ctx_stickr.canvas.width/2;\n";    
+    website += "          var pady1=gamepad.axes[3]*ctx_stickr.canvas.height/2;\n";
+    website += "          if(document.getElementById(\"invert1\").checked)\n";
+    website += "            pady0=-pady0;\n";
+    website += "          if(document.getElementById(\"invert2\").checked)\n";
+    website += "            pady1=-pady1;\n";
+    website += "          draw_stick(ctx_stickl,parseInt(document.getElementById(\"trim1x\").value)+(ctx_stickl.canvas.width/2)+padx0,(ctx_stickl.canvas.height/2)+pady0-parseInt(document.getElementById(\"trim1y\").value),0,1);\n";
+    website += "          draw_stick(ctx_stickr,parseInt(document.getElementById(\"trim2x\").value)+(ctx_stickr.canvas.width/2)+padx1,(ctx_stickr.canvas.height/2)+pady1-parseInt(document.getElementById(\"trim2y\").value),2,3);\n";
+	website += "          checkButton(gamepad, 0)\n";
+	website += "	      checkButton(gamepad,1)\n";
+	website += "        })\n";
     website += "        window.requestAnimationFrame(update);\n";
     website += "      }\n";
     website += "      else\n";
