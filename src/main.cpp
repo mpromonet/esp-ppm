@@ -399,15 +399,15 @@ void handleRoot()
 	website += "          const gamepad = window.navigator.getGamepads()[padIndex]\n";
     website += "          var padx0=gamepad.axes[0]*ctx_stickl.canvas.width/2;\n";
     website += "          var pady0=gamepad.axes[1]*ctx_stickl.canvas.height/2;\n";
-    website += "          var padx1=gamepad.axes[2]*ctx_stickr.canvas.width/2;\n";    
-    website += "          var pady1=gamepad.axes[3]*ctx_stickr.canvas.height/2;\n";
+    website += "          var padx1=gamepad.axes[5]*ctx_stickr.canvas.width/2;\n";    
+    website += "          var pady1=gamepad.axes[2]*ctx_stickr.canvas.height/2;\n";
     website += "          if(document.getElementById(\"invert1\").checked)\n";
     website += "            pady0=-pady0;\n";
     website += "          if(document.getElementById(\"invert2\").checked)\n";
     website += "            pady1=-pady1;\n";
     website += "          draw_stick(ctx_stickl,parseInt(document.getElementById(\"trim1x\").value)+(ctx_stickl.canvas.width/2)+padx0,(ctx_stickl.canvas.height/2)+pady0-parseInt(document.getElementById(\"trim1y\").value),0,1);\n";
     website += "          draw_stick(ctx_stickr,parseInt(document.getElementById(\"trim2x\").value)+(ctx_stickr.canvas.width/2)+padx1,(ctx_stickr.canvas.height/2)+pady1-parseInt(document.getElementById(\"trim2y\").value),2,3);\n";
-	website += "          checkButton(gamepad, 0)\n";
+	website += "          checkButton(gamepad,0)\n";
 	website += "	      checkButton(gamepad,1)\n";
 	website += "        })\n";
     website += "        window.requestAnimationFrame(update);\n";
